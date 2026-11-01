@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101116">
+    <title>HOGER / LAGER</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- HOOFDMENU -->
+    <section id="main-menu" class="screen">
+        <div class="menu-content">
+            <h1 class="game-logo">HOGER <span>/</span> LAGER</h1>
+            <p class="subtitle">THE CARD GAME</p>
+
+            <button id="new-game" class="menu-button">NEW GAME</button>
+            <button id="how-to-play" class="menu-button">HOW TO PLAY</button>
+            <button id="settings" class="menu-button">SETTINGS</button>
+        </div>
+    </section>
+
+
+    <!-- SPELINSTELLINGEN -->
+    <section id="game-setup" class="screen hidden">
+        <div class="setup-panel">
+
+            <h2>NEW GAME</h2>
+
+            <!-- AANTAL SPELERS -->
+            <div class="setup-info">
+                <p>NUMBER OF PLAYERS</p>
+
+                <div class="player-count-selection">
+
+                    <button class="player-count selected"
+                            data-players="2">
+                        2 PLAYERS
+                    </button>
+
+                    <button class="player-count"
+                            data-players="3">
+                        3 PLAYERS
+                    </button>
+
+                    <button class="player-count"
+                            data-players="4">
+                        4 PLAYERS
+                    </button>
+
+                </div>
+
+                <span id="player-count-description">
+                    YOU + 1 AI OPPONENT
+                </span>
+            </div>
+
+
+            <!-- AI MOEILIJKHEID -->
+            <div class="difficulty-selection">
+                <p>AI DIFFICULTY</p>
+
+                <button class="difficulty selected"
+                        data-difficulty="easy">
+                    EASY
+                </button>
+
+                <button class="difficulty"
+                        data-difficulty="normal">
+                    NORMAL
+                </button>
+            </div>
+
+
+            <button id="start-game" class="menu-button">
+                START GAME
+            </button>
+
+            <button id="back-menu" class="back-button">
+                BACK
+            </button>
+
+        </div>
+    </section>
+
+
+    <!-- SPEELBORD -->
+    <section id="game-screen" class="screen hidden">
+
+        <header class="game-header">
+            <h1>HOGER <span>/</span> LAGER</h1>
+
+            <div class="game-status">
+                <span id="turn-indicator">YOUR TURN</span>
+                <span id="direction-indicator">CLOCKWISE</span>
+            </div>
+        </header>
+
+
+        <!-- ACTIEVE SPELREGEL -->
+        <div id="active-rule" class="active-rule higher">
+            HOGER
+        </div>
+
+
+        <!-- SPELERS -->
+        <div class="opponents-area">
+
+            <!-- AI SPELER 1 -->
+            <div class="opponent opponent-top" id="player-1">
+                <div class="player-avatar">AI 1</div>
+
+                <div class="player-info">
+                    <h3>OPPONENT 1</h3>
+                    <p>
+                        <span class="card-count">7</span> CARDS
+                    </p>
+                </div>
+
+                <div class="opponent-hand" id="player-1-cards"></div>
+            </div>
+
+
+            <!-- AI SPELER 2 -->
+            <div class="opponent opponent-side" id="player-2">
+                <div class="player-avatar">AI 2</div>
+
+                <div class="player-info">
+                    <h3>OPPONENT 2</h3>
+                    <p>
+                        <span class="card-count">7</span> CARDS
+                    </p>
+                </div>
+
+                <div class="opponent-hand" id="player-2-cards"></div>
+            </div>
+
+        </div>
+
+
+        <!-- CENTRALE SPEELZONE -->
+        <main class="play-area">
+
+            <div class="deck-area">
+
+                <!-- TREKSTAPEL -->
+                <div class="deck-container">
+                    <h3>DRAW PILE</h3>
+
+                    <div id="draw-pile" class="card-pile">
+                        <span id="draw-count">0</span>
+                    </div>
+                </div>
+
+
+                <!-- AFLEGSTAPEL -->
+                <div class="discard-container">
+                    <h3>DISCARD PILE</h3>
+
+                    <div id="discard-pile" class="card-pile">
+                        <span id="discard-placeholder">START</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="game-message" class="game-message">
+                Waiting for game...
+            </div>
+
+        </main>
+
+
+        <!-- JOUW HAND -->
+        <footer class="player-area">
+
+            <div class="your-player-info">
+                <h2>YOUR HAND</h2>
+                <span id="your-card-count">0 CARDS</span>
+            </div>
+
+            <div id="your-hand" class="your-hand"></div>
+
+            <div class="game-controls">
+
+                <button id="draw-cards-button" disabled>
+                    DRAW 2 CARDS
+                </button>
+
+                <button id="pass-turn-button" disabled>
+                    END TURN
+                </button>
+
+                <button id="leave-game-button">
+                    LEAVE GAME
+                </button>
+
+            </div>
+
+        </footer>
+
+    </section>
+
+
+    <!-- OFFICIAL RULEBOOK -->
+    <section id="rules-screen" class="screen hidden">
+
+        <div class="rulebook-container">
+
+            <header class="rulebook-header">
+
+                <button id="rules-back" class="rulebook-back">
+                    ← BACK
+                </button>
+
+                <div class="rulebook-title">
+                    <span class="rulebook-subtitle">HOGER / LAGER</span>
+                    <h1>HOW TO PLAY</h1>
+                    <p>OFFICIAL RULEBOOK</p>
+                </div>
+
+            </header>
+
+
+            <nav class="rulebook-navigation">
+                <a href="#rules-goal">OBJECTIVE</a>
+                <a href="#rules-deck">THE DECK</a>
+                <a href="#rules-setup">SETUP</a>
+                <a href="#rules-turn">YOUR TURN</a>
+                <a href="#rules-special">SPECIAL CARDS</a>
+                <a href="#rules-end">GAME END</a>
+            </nav>
+
+
+            <main class="rulebook-content" id="rules-content">
+
+                <!-- 01 OBJECTIVE -->
+                <section class="rulebook-section" id="rules-goal">
+
+                    <span class="rulebook-number">01</span>
+                    <h2>🎯 Objective</h2>
+
+                    <p>
+                        Wees de allerlaagste of juist slimste speler die als
+                        eerste al zijn handkaarten weet weg te spelen.
+                    </p>
+
+                    <div class="rulebook-highlight">
+                        De speler die als eerste 0 kaarten over heeft,
+                        wint het spel!
+                    </div>
+
+                </section>
+
+
+                <!-- 02 THE DECK -->
+                <section class="rulebook-section" id="rules-deck">
+
+                    <span class="rulebook-number">02</span>
+                    <h2>📦 Contents of the Deck</h2>
+
+                    <p><strong>Basisdeck: 62 kaarten</strong></p>
+
+                    <p>
+                        Dit spel is ontworpen voor 2 tot 4 spelers.
+                        Met een tweede deck kun je zelfs met 8 spelers spelen.
+                    </p>
+
+                    <h3>Number Cards – 39</h3>
+
+                    <p>
+                        De getallen 1 tot en met 13.
+                        Elk getal zit 3 keer in het deck.
+                    </p>
+
+                    <h3>Rule & Direction Cards – 12</h3>
+
+                    <ul>
+                        <li>Hoger-kaarten: 4</li>
+                        <li>Lager-kaarten: 4</li>
+                        <li>Richting omdraaien-kaarten: 4</li>
+                    </ul>
+
+                    <h3>Action Cards – 11</h3>
+
+                    <ul>
+                        <li>Hoogste kaart doorgeven: 4</li>
+                        <li>Laagste kaart doorgeven: 4</li>
+                        <li>De Grote Reset: maximaal 3 in het spel</li>
+                    </ul>
+
+                </section>
+
+
+                <!-- 03 SETUP -->
+                <section class="rulebook-section" id="rules-setup">
+
+                    <span class="rulebook-number">03</span>
+                    <h2>🛠️ Game Setup</h2>
+
+                    <ol>
+                        <li>Schud het hele deck kaarten grondig.</li>
+                        <li>Geef iedere speler 7 kaarten gedekt in de hand.</li>
+                        <li>
+                            Leg de resterende kaarten gedekt in het midden
+                            als trekstapel.
+                        </li>
+                        <li>
+                            Draai de bovenste kaart van de trekstapel om en
+                            leg deze open naast de trekstapel. Dit is het
+                            begin van de aflegstapel.
+                        </li>
+                        <li>De speler links van de deler begint.</li>
+                        <li>Het spel verloopt standaard kloksgewijs.</li>
+                    </ol>
+
+                    <div class="rulebook-highlight">
+                        De startregel van het spel is altijd HOGER.
+                    </div>
+
+                </section>
+
+
+                <!-- 04 YOUR TURN -->
+                <section class="rulebook-section" id="rules-turn">
+
+                    <span class="rulebook-number">04</span>
+                    <h2>🔄 How to Play</h2>
+
+                    <p>
+                        Als je aan de beurt bent, probeer je één kaart uit je
+                        hand open op de aflegstapel te leggen. Je moet hierbij
+                        voldoen aan de actieve regel.
+                    </p>
+
+                    <div class="rulebook-rule-grid">
+
+                        <div class="rulebook-rule higher-rule">
+                            <h3>📈 HOGER</h3>
+
+                            <p>
+                                Je legt een kaart neer die hoger is dan of
+                                gelijk is aan de bovenste kaart van de aflegstapel.
+                            </p>
+                        </div>
+
+                        <div class="rulebook-rule lower-rule">
+                            <h3>📉 LAGER</h3>
+
+                            <p>
+                                Je legt een kaart neer die lager is dan of
+                                gelijk is aan de bovenste kaart van de aflegstapel.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <h3>Kan of wil je niet leggen?</h3>
+
+                    <p>
+                        Heb je geen passende kaart of wil je niets spelen?
+                        Dan moet je 2 strafkaarten trekken van de trekstapel.
+                    </p>
+
+                    <div class="rulebook-warning">
+                        De getrokken strafkaarten mag je niet direct in dezelfde
+                        beurt afleggen. Je beurt eindigt direct nadat je de
+                        strafkaarten hebt gepakt. De volgende speler is aan de beurt.
+                    </div>
+
+                </section>
+
+
+                <!-- 05 SPECIAL CARDS -->
+                <section class="rulebook-section" id="rules-special">
+
+                    <span class="rulebook-number">05</span>
+                    <h2>⚡ Special Cards & Actions</h2>
+
+                    <p>
+                        Wanneer je een speciale kaart van je hand op de
+                        aflegstapel legt, voer je direct de bijbehorende actie uit.
+                    </p>
+
+
+                    <div class="rulebook-special-card">
+
+                        <div class="special-icon">📈</div>
+
+                        <div>
+                            <h3>Hoger-kaart</h3>
+
+                            <p>
+                                De regel verandert naar HOGER. Vanaf nu moet er
+                                weer een hoger getal (of gelijk) worden opgelegd.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rulebook-special-card">
+
+                        <div class="special-icon">📉</div>
+
+                        <div>
+                            <h3>Lager-kaart</h3>
+
+                            <p>
+                                De regel verandert naar LAGER. Vanaf nu moet er
+                                een lager getal (of gelijk) worden opgelegd.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rulebook-special-card">
+
+                        <div class="special-icon">🔄</div>
+
+                        <div>
+                            <h3>Richting omdraaien</h3>
+
+                            <p>
+                                De speelrichting keert om. Speelden jullie
+                                kloksgewijs? Dan gaat het spel nu tegen de klok
+                                in verder (en vice versa als deze kaart later
+                                nog eens wordt gespeeld).
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rulebook-special-card">
+
+                        <div class="special-icon">➡️</div>
+
+                        <div>
+                            <h3>Hoogste kaart doorgeven</h3>
+
+                            <p>
+                                Elke speler pakt zijn eigen hoogste handkaart
+                                en geeft deze door aan zijn buur. De richting
+                                waarin je doorgeeft is altijd gelijk aan de
+                                actuele speelrichting.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rulebook-special-card">
+
+                        <div class="special-icon">⬅️</div>
+
+                        <div>
+                            <h3>Laagste kaart doorgeven</h3>
+
+                            <p>
+                                Elke speler pakt zijn eigen laagste handkaart
+                                en geeft deze door aan zijn buur, rekening
+                                houdend met de speelrichting.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rulebook-special-card reset-card">
+
+                        <div class="special-icon">🌪️</div>
+
+                        <div>
+                            <h3>De Grote Reset</h3>
+
+                            <p><strong>Maximaal 3 in het spel!</strong></p>
+
+                            <p>
+                                Alle spelers leveren al hun handkaarten in.
+                                Al deze kaarten worden samengedaan, grondig
+                                geschud en opnieuw verdeeld tot iedere speler
+                                weer exact evenveel kaarten in de hand heeft
+                                als voor de reset.
+                            </p>
+
+                            <p>
+                                De overige kaarten gaan op de aflegstapel.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 06 GAME END -->
+                <section class="rulebook-section" id="rules-end">
+
+                    <span class="rulebook-number">06</span>
+                    <h2>🏆 End of the Game</h2>
+
+                    <p>
+                        Zodra een speler zijn allerlaatste kaart aflegt en met
+                        0 kaarten overblijft, roept deze speler "Uit!"
+                        (of wint direct).
+                    </p>
+
+                    <div class="rulebook-victory">
+
+                        <span>🏆</span>
+                        <h3>VICTORY!</h3>
+
+                        <p>
+                            Het spel is meteen afgelopen en deze speler
+                            kroont zich tot de winnaar!
+                        </p>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+
+            <footer class="rulebook-footer">
+                HOGER / LAGER — OFFICIAL RULEBOOK
+            </footer>
+
+        </div>
+
+    </section>
+
+
+    <!-- INSTELLINGEN -->
+    <section id="settings-screen" class="screen hidden">
+
+        <div class="setup-panel">
+
+            <h2>SETTINGS</h2>
+            <p>Game settings</p>
+
+            <button id="settings-back" class="back-button">
+                BACK
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- KAARTEN DOORGEVEN -->
+    <section id="passing-screen" class="screen hidden">
+
+        <div class="setup-panel">
+
+            <h2>PASS A CARD</h2>
+
+            <p id="passing-instruction">
+                Select your card.
+            </p>
+
+            <div id="passing-hand" class="your-hand"></div>
+
+            <button id="confirm-passing" disabled>
+                CONFIRM SELECTION
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- EINDE SPEL -->
+    <section id="game-over-screen" class="screen hidden">
+
+        <div class="setup-panel">
+
+            <h2 id="game-over-title">GAME OVER</h2>
+
+            <p id="game-over-message"></p>
+
+            <button id="new-game-again" class="menu-button">
+                NEW GAME
+            </button>
+
+            <button id="game-over-menu" class="back-button">
+                MAIN MENU
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- JAVASCRIPT -->
+    <script src="js/deck.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/game.js"></script>
+
+</body>
+</html>
