@@ -1,4 +1,3 @@
-
 "use strict";
 
 // ==========================================
@@ -469,18 +468,20 @@ function showMessage(message) {
 }
 
 // ==========================================
-// TOP NUMBER
+// TOP NUMBER (Zoekt door naar het laatste echte getal)
 // ==========================================
 
 function getTopNumber() {
 
-    const topCard = discardPile[discardPile.length - 1];
-
-    if (!topCard || topCard.type !== "number") {
-        return null;
+    // Zoek vanaf de bovenkant van de aflegstapel naar beneden naar het laatste getal
+    for (let i = discardPile.length - 1; i >= 0; i--) {
+        const card = discardPile[i];
+        if (card && card.type === "number") {
+            return card.value;
+        }
     }
 
-    return topCard.value;
+    return null;
 }
 
 // ==========================================
@@ -646,9 +647,9 @@ function executeCardEffect(card) {
 
         case "great-reset":
 
-            executeGreatReset();
+            beginGreatReset();
 
-            break;
+            return;
 
         case "pass-lowest":
 
@@ -667,25 +668,103 @@ function executeCardEffect(card) {
 }
 
 // ==========================================
-// GREAT RESET
+// GREAT RESET (Handmatige selectie van 3 kaarten)
 // ==========================================
 
-function executeGreatReset() {
+function beginGreatReset() {
 
-    const result =
-        window.HigherLowerActions.greatReset(players);
+    waitingForPassing = true;
 
-    result.discardCards.forEach(card => {
-        discardPile.push(card);
+    const selections = [];
+
+    // AI spelers kiezen automatisch tot 3 kaarten om te ruilen
+    players.forEach((player, index) => {
+        if (player.isAI) {
+            selections[index] = player.hand.slice(0, Math.min(3, player.hand.length));
+        }
     });
 
-    showMessage("DE GROTE RESET is uitgevoerd.");
+    passingScreen.classList.remove("hidden");
+    gameScreen.classList.add("hidden");
 
-    renderGame();
+    const requiredCount = Math.min(3, players[0].hand.length);
+
+    $("passing-instruction").textContent = 
+        `DE GROTE RESET: Selecteer ${requiredCount} kaarten om in te ruilen.`;
+
+    const handElement = $("passing-hand");
+    handElement.innerHTML = "";
+
+    const selectedCards = [];
+
+    players[0].hand.forEach(card => {
+
+        const image = document.createElement("img");
+
+        image.src = card.image;
+        image.className = "game-card";
+
+        image.addEventListener("click", () => {
+
+            const index = selectedCards.findIndex(c => c.id === card.id);
+
+            if (index !== -1) {
+                selectedCards.splice(index, 1);
+                image.classList.remove("selected");
+            } else {
+                if (selectedCards.length < requiredCount) {
+                    selectedCards.push(card);
+                    image.classList.add("selected");
+                }
+            }
+
+            $("confirm-passing").disabled = (selectedCards.length !== requiredCount);
+        });
+
+        handElement.appendChild(image);
+    });
+
+    $("confirm-passing").disabled = true;
+
+    $("confirm-passing").onclick = () => {
+
+        if (selectedCards.length !== requiredCount) return;
+
+        selections[0] = selectedCards;
+
+        try {
+
+            window.HigherLowerActions.greatReset(
+                players,
+                selections,
+                drawPile,
+                discardPile
+            );
+
+            waitingForPassing = false;
+
+            passingScreen.classList.add("hidden");
+            gameScreen.classList.remove("hidden");
+
+            showMessage("DE GROTE RESET: Iedereen heeft zijn geselecteerde kaarten gewisseld!");
+
+            renderGame();
+
+            if (!checkWinner()) {
+                finishTurn();
+            }
+
+        } catch (error) {
+
+            showMessage(error.message);
+
+            console.error(error);
+        }
+    };
 }
 
 // ==========================================
-// PASSING CARDS
+// PASSING CARDS (Verplicht hoogste of laagste)
 // ==========================================
 
 function beginPassing(type) {
@@ -694,11 +773,10 @@ function beginPassing(type) {
 
     const selections = [];
 
-    // Iedere AI kiest zijn eigen kaart.
+    // Bepaal de juiste kaart voor alle AI spelers (altijd automatisch de hoogste of laagste)
     players.forEach((player, index) => {
 
         if (player.isAI) {
-
             selections[index] =
                 window.HigherLowerAI.selectPassingCard(
                     player.hand,
@@ -710,18 +788,30 @@ function beginPassing(type) {
     passingScreen.classList.remove("hidden");
     gameScreen.classList.add("hidden");
 
-    $("passing-instruction").textContent =
-        type === "pass-lowest"
-            ? "Selecteer je laagste kaart."
-            : "Selecteer je hoogste kaart.";
+    const isLowest = (type === "pass-lowest");
+
+    $("passing-instruction").textContent = isLowest
+        ? "Laagste kaart doorgeven. Je moet verplicht je LAAGSTE kaart selecteren!"
+        : "Hoogste kaart doorgeven. Je moet verplicht je HOOGSTE kaart selecteren!";
 
     const handElement = $("passing-hand");
-
     handElement.innerHTML = "";
+
+    // Bepaal wat de menselijke speler verplicht moet kiezen
+    const humanHand = players[0].hand;
+    let requiredCard = humanHand[0];
+
+    humanHand.forEach(card => {
+        if (isLowest) {
+            if (card.value < requiredCard.value) requiredCard = card;
+        } else {
+            if (card.value > requiredCard.value) requiredCard = card;
+        }
+    });
 
     let selectedCard = null;
 
-    players[0].hand.forEach(card => {
+    humanHand.forEach(card => {
 
         const image = document.createElement("img");
 
@@ -729,6 +819,11 @@ function beginPassing(type) {
         image.className = "game-card";
 
         image.addEventListener("click", () => {
+
+            if (card.id !== requiredCard.id) {
+                showMessage("Dat is niet je " + (isLowest ? "laagste" : "hoogste") + " kaart! Je moet de verplichte kaart kiezen.");
+                return;
+            }
 
             selectedCard = card;
 

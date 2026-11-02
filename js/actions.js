@@ -1,4 +1,3 @@
-
 "use strict";
 
 // ==========================================
@@ -36,41 +35,56 @@ window.HigherLowerActions = {
     },
 
     // ======================================
-    // DE GROTE RESET
+    // DE GROTE RESET (Spelers kiezen zelf hun 3 kaarten)
     // ======================================
 
-    greatReset(players) {
+    greatReset(players, selections, drawPile, discardPile) {
 
-        // Bewaar hoeveel kaarten iedere speler had.
-        const handSizes = players.map(
-            player => player.hand.length
-        );
+        const returnedCards = [];
 
-        // Verzamel alle handkaarten.
-        const cardPool = [];
-
-        players.forEach(player => {
-            cardPool.push(...player.hand);
-            player.hand = [];
-        });
-
-        // Schud alle verzamelde kaarten.
-        this.shuffle(cardPool);
-
-        // Geef iedere speler evenveel kaarten terug
-        // als hij vóór de reset had.
+        // Verwijder de geselecteerde kaarten uit de hand van elke speler
         players.forEach((player, index) => {
-
-            const amount = handSizes[index];
-
-            player.hand = cardPool.splice(0, amount);
-
+            const chosenCards = selections[index] || [];
+            
+            chosenCards.forEach(selectedCard => {
+                const cardIndex = player.hand.findIndex(
+                    card => card.id === selectedCard.id
+                );
+                if (cardIndex !== -1) {
+                    returnedCards.push(player.hand.splice(cardIndex, 1)[0]);
+                }
+            });
         });
 
-        // Eventuele overblijvende kaarten gaan naar de aflegstapel.
+        // Schud alle ingeleverde kaarten grondig
+        this.shuffle(returnedCards);
+
+        // Geef iedere speler exact zoveel nieuwe kaarten terug als hij heeft ingeleverd
+        players.forEach((player, index) => {
+            const countToDraw = (selections[index] || []).length;
+            
+            for (let i = 0; i < countToDraw; i++) {
+                // Als de trekstapel leeg is, vul deze aan vanuit de aflegstapel
+                if (drawPile.length === 0 && discardPile && discardPile.length > 1) {
+                    const topCard = discardPile.pop();
+                    drawPile.push(...discardPile);
+                    discardPile.length = 0;
+                    discardPile.push(topCard);
+                    this.shuffle(drawPile);
+                }
+                
+                if (drawPile.length > 0) {
+                    player.hand.push(drawPile.pop());
+                }
+            }
+        });
+
+        // Eventuele ingeleverde kaarten worden teruggelegd/geschud op de trekstapel
+        drawPile.push(...returnedCards);
+        this.shuffle(drawPile);
+
         return {
-            discardCards: cardPool,
-            handSizes: handSizes
+            discardCards: []
         };
     },
 
