@@ -84,7 +84,7 @@ for (const definition of specialCards) {
             id: id,
             image: `${CARD_IMAGE_PATH}${imageName}.png`,
             type: definition.type,
-            value: null,
+            value: 14,
             name: definition.name
         });
     }
